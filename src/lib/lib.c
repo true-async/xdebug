@@ -896,7 +896,8 @@ void xdebug_lib_register_compiled_variables(function_stack_entry *fse)
 		return;
 	}
 
-	if (!fse->op_array->vars) {
+	// if fse->op_array == NULL
+	if (fse->op_array == NULL || !fse->op_array->vars) {
 		return;
 	}
 
