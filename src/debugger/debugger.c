@@ -864,6 +864,15 @@ void xdebug_debugger_zend_shutdown(void)
 void xdebug_debugger_minit(void)
 {
 	XG_DBG(breakpoint_count) = 0;
+	XG_DBG(breakable_lines_map) = NULL;
+}
+
+void xdebug_debugger_mshutdown(void)
+{
+	if (XG_DBG(breakable_lines_map)) {
+		xdebug_hash_destroy(XG_DBG(breakable_lines_map));
+		XG_DBG(breakable_lines_map) = NULL;
+	}
 }
 
 void xdebug_debugger_minfo(void)
@@ -918,7 +927,9 @@ void xdebug_debugger_rinit(void)
 	XG_DBG(breakpoints_allowed) = 1;
 	XG_DBG(suppress_return_value_step) = 0;
 	XG_DBG(detached) = 0;
-	XG_DBG(breakable_lines_map) = xdebug_hash_alloc(2048, (xdebug_hash_dtor_t) xdebug_line_list_dtor);
+	if (!XINI_DBG(stateful_mode) || XG_DBG(breakable_lines_map) == NULL) {
+		XG_DBG(breakable_lines_map) = xdebug_hash_alloc(2048, (xdebug_hash_dtor_t) xdebug_line_list_dtor);
+	}
 	XG_DBG(function_count) = 0;
 	XG_DBG(class_count) = 0;
 
@@ -959,8 +970,10 @@ void xdebug_debugger_post_deactivate(void)
 		XG_DBG(context).list.last_filename = NULL;
 	}
 
-	xdebug_hash_destroy(XG_DBG(breakable_lines_map));
-	XG_DBG(breakable_lines_map) = NULL;
+	if (!XINI_DBG(stateful_mode)) {
+		xdebug_hash_destroy(XG_DBG(breakable_lines_map));
+		XG_DBG(breakable_lines_map) = NULL;
+	}
 
 	if (XG_DBG(context).connected_hostname) {
 		xdfree(XG_DBG(context).connected_hostname);

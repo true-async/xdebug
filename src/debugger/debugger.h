@@ -58,6 +58,7 @@ typedef struct _xdebug_debugger_settings_t {
 	zend_long     connect_timeout_ms; /* Timeout in MS for remote connections */
 
 	char         *ide_key_setting; /* Set through php.ini and friends */
+	zend_bool     stateful_mode; /* Preserve breakable_lines_map between requests */
 } xdebug_debugger_settings_t;
 
 PHP_INI_MH(OnUpdateDebugMode);
@@ -89,6 +90,7 @@ void xdebug_debugger_handle_breakpoints(function_stack_entry *fse, int breakpoin
 void xdebug_debugger_zend_startup(void);
 void xdebug_debugger_zend_shutdown(void);
 void xdebug_debugger_minit(void);
+void xdebug_debugger_mshutdown(void);
 void xdebug_debugger_minfo(void);
 void xdebug_debugger_rinit(void);
 void xdebug_debugger_post_deactivate(void);
