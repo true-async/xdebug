@@ -56,6 +56,7 @@ typedef struct _xdebug_base_globals_t {
 	unsigned int  function_count;
 	zend_string  *last_eval_statement;
 	char         *last_exception_trace;
+	zend_bool     statement_handler_enabled;
 
 	/* in-execution checking */
 	zend_bool  in_execution;
@@ -71,7 +72,8 @@ typedef struct _xdebug_base_globals_t {
 # ifdef __linux__
 	int        control_socket_fd;
 # elif WIN32
-	HANDLE     control_socket_h;
+	HANDLE      control_socket_h;
+	OVERLAPPED  control_socket_ov;
 # endif
 #endif
 
