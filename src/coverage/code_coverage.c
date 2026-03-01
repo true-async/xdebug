@@ -1148,7 +1148,12 @@ static void add_fiber_main(zend_string *fiber_key, zend_fiber_context *fiber)
 	tmp->function.object_class = NULL;
 	tmp->function.scope_class = NULL;
 	tmp->function.function = zend_string_copy(fiber_key);
-	tmp->filename = zend_string_copy(zend_get_executed_filename_ex());
+	{
+		zend_string *executed_filename = zend_get_executed_filename_ex();
+		tmp->filename = executed_filename
+			? zend_string_copy(executed_filename)
+			: zend_string_init("{unknown}", sizeof("{unknown}") - 1, 0);
+	}
 	tmp->lineno = zend_get_executed_lineno();
 
 	tmp->prev_memory = XG_BASE(prev_memory);

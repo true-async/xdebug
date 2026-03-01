@@ -695,7 +695,10 @@ function_stack_entry *xdebug_add_stack_frame(zend_execute_data *zdata, zend_op_a
 		if (tmp->function.type == XFUNC_EVAL && XG_BASE(last_eval_statement)) {
 			tmp->function.include_filename = zend_string_copy(XG_BASE(last_eval_statement));
 		} else {
-			tmp->function.include_filename = zend_string_copy(zend_get_executed_filename_ex());
+			zend_string *executed_filename = zend_get_executed_filename_ex();
+			tmp->function.include_filename = executed_filename
+				? zend_string_copy(executed_filename)
+				: zend_string_init("{unknown}", sizeof("{unknown}") - 1, 0);
 		}
 	} else {
 		tmp->lineno = find_line_number_for_current_execute_point(edata);

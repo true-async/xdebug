@@ -665,7 +665,7 @@ int xdebug_format_filename(char **formatted_name, const char *default_fmt, zend_
 	xdebug_str fname = XDEBUG_STR_INITIALIZER;
 	char *name;
 	xdebug_str *parent, *ancester;
-	const char *full_filename = ZSTR_VAL(filename);
+	const char *full_filename = filename ? ZSTR_VAL(filename) : "{unknown}";
 	xdebug_arg *parts;
 	char *slash = xdebug_sprintf("%c", DEFAULT_SLASH);
 	char *fmt = XINI_LIB(filename_format);

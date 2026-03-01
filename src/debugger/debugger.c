@@ -312,6 +312,14 @@ int xdebug_debugger_map_remote_to_local(zend_string *remote_filename, int remote
 {
 	int result;
 
+	if (!remote_filename) {
+		*local_path = xdebug_str_create("{unknown}", sizeof("{unknown}") - 1);
+		*local_line = remote_lineno;
+		*must_free = true;
+
+		return XDEBUG_PATH_MAP_RESULT_UNKNOWN;
+	}
+
 	if (!xdebug_lib_path_mapping_enabled()) {
 		goto pass_through;
 	}
