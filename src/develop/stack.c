@@ -871,8 +871,8 @@ char *xdebug_get_printable_stack(int html, int error_type, const char *buffer, c
 	char       *error_type_str = xdebug_error_type(error_type);
 	char       *error_type_str_simple = xdebug_error_type_simple(error_type);
 	xdebug_str  str = XDEBUG_STR_INITIALIZER;
-	char       *prepend_string = INI_STR((char*) "error_prepend_string");
-	char       *append_string = INI_STR((char*) "error_append_string");
+	char       *prepend_string = (char*) zend_ini_string("error_prepend_string", sizeof("error_prepend_string")-1, false);
+	char       *append_string = (char*) zend_ini_string("error_append_string", sizeof("error_append_string")-1, false);
 
 	if (prepend_string) {
 		xdebug_str_add(&str, prepend_string, 0);
@@ -939,8 +939,8 @@ static char *xdebug_handle_stack_trace(int type, char *error_type_str, const cha
 	/* We need to see if we have an uncaught exception fatal error now */
 	if (type == E_ERROR && ((tmp_buf = xdebug_strip_php_stack_trace(buffer)) != NULL)) {
 		xdebug_str  str = XDEBUG_STR_INITIALIZER;
-		char       *prepend_string = INI_STR((char*) "error_prepend_string");
-		char       *append_string = INI_STR((char*) "error_append_string");
+		char       *prepend_string = (char*) zend_ini_string("error_prepend_string", sizeof("error_prepend_string")-1, false);
+		char       *append_string = (char*) zend_ini_string("error_append_string", sizeof("error_append_string")-1, false);
 
 		if (prepend_string) {
 			xdebug_str_add(&str, prepend_string, 0);
@@ -1268,8 +1268,8 @@ void xdebug_develop_throw_exception_hook(zend_object *exception, zval *file, zva
 		}
 		if (PG(display_errors)) {
 			xdebug_str displ_tmp_str = XDEBUG_STR_INITIALIZER;
-			char *prepend_string = INI_STR((char*) "error_prepend_string");
-			char *append_string = INI_STR((char*) "error_append_string");
+			char *prepend_string = (char*) zend_ini_string("error_prepend_string", sizeof("error_prepend_string")-1, false);
+			char *append_string = (char*) zend_ini_string("error_append_string", sizeof("error_append_string")-1, false);
 
 			if (prepend_string) {
 				xdebug_str_add(&displ_tmp_str, prepend_string, 0);
