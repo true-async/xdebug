@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | Xdebug                                                               |
    +----------------------------------------------------------------------+
-   | Copyright (c) 2002-2025 Derick Rethans                               |
+   | Copyright (c) 2002-2026 Derick Rethans                               |
    +----------------------------------------------------------------------+
    | This source file is subject to version 1.01 of the Xdebug license,   |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -429,7 +429,7 @@ FILE *xdebug_fopen(char *fname, const char *mode, const char *extension, char **
 	} else {
 		tmp_fname = xdstrdup(fname);
 	}
-	r = stat(tmp_fname, &buf);
+	r = lstat(tmp_fname, &buf);
 	/* We're not freeing "tmp_fname" as that is used in the freopen as well. */
 
 	if (r == -1) {
@@ -438,10 +438,16 @@ FILE *xdebug_fopen(char *fname, const char *mode, const char *extension, char **
 		goto lock;
 	}
 
-	/* 3. It exists, check if we can open it. */
+	/* 3. If the file exists, but is a symlink, we need to not follow it, and instead create a new file */
+	if (S_ISLNK(buf.st_mode)) {
+		fh = xdebug_open_file_with_random_ext(fname, "w", extension, new_fname);
+		goto lock;
+	}
+
+	/* 4. It exists, check if we can open it. */
 	fh = xdebug_open_file(fname, "r+", extension, new_fname);
 	if (!fh) {
-		/* 4. If fh == null we couldn't even open the file, so open a new one with a new name */
+		/* If fh == null we couldn't even open the file, so open a new one with a new name */
 		fh = xdebug_open_file_with_random_ext(fname, "w", extension, new_fname);
 		goto lock;
 	}
@@ -594,7 +600,7 @@ int xdebug_format_output_filename(char **filename, char *format, char *script_na
 				case 'S': { /* session id */
 					zval *data;
 					char *char_ptr, *strval;
-					char *sess_name;
+					const char *sess_name;
 
 					sess_name = zend_ini_string((char*) "session.name", sizeof("session.name"), 0);
 
